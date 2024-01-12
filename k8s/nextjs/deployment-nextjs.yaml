@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: next-carcenter-erding
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: next-carcenter-erding
@@ -51,3 +51,8 @@ spec:
                   key: encoded-credentials
           ports:
             - containerPort: 3000
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1

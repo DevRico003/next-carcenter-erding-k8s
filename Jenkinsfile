@@ -38,7 +38,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([file(credentialsId: 'kubeconfig-id', variable: 'KUBECONFIG')]) {
-                        sh "kubectl apply -f k8s/nextjs/deployment-nextjs.yaml --kubeconfig ${KUBECONFIG}"
+                        sh "kubectl set image deployment/next-carcenter-erding nextjs=devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} --kubeconfig ${KUBECONFIG}"
                     }
                 }
             }
