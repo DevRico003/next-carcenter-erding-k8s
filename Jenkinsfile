@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Clone repository') {
             steps {
-                checkout scm: [$class: 'GitSCM', branches: [[name: '*/k8s']], userRemoteConfigs: [[credentialsId: 'github-id', url: 'https://github.com/DevRico003/next-cardealer.git']]]
+                checkout scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[credentialsId: 'github-id', url: 'https://github.com/DevRico003/next-carcenter-erding-k8s.git']]]
             }
         }
 
