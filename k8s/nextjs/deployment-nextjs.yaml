@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: nextjs
-          image: devrico003/next-carcenter-erding:latest
+          image: devrico003/next-carcenter-erding-k8s:latest
           imagePullPolicy: Always
           env:
             - name: AWS_ACCESS_KEY_ID

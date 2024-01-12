@@ -15,9 +15,9 @@ pipeline {
         stage('Build Docker image') {
             steps {
                 script {
-                    sh "sudo docker build -t devrico003/next-carcenter-erding:${env.BUILD_ID} ."
+                    sh "sudo docker build -t devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} ."
                     // Taggen des Images mit 'latest'
-                    sh "sudo docker tag devrico003/next-carcenter-erding:${env.BUILD_ID} devrico003/next-carcenter-erding:latest"
+                    sh "sudo docker tag devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} devrico003/next-carcenter-erding-k8s:latest"
                 }
             }
         }
@@ -27,8 +27,8 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
                         sh "echo $DOCKERHUB_PASS | sudo docker login -u $DOCKERHUB_USER --password-stdin"
-                        sh "sudo docker push devrico003/next-carcenter-erding:${env.BUILD_ID}"
-                        sh "sudo docker push devrico003/next-carcenter-erding:latest"
+                        sh "sudo docker push devrico003/next-carcenter-erding-k8s:${env.BUILD_ID}"
+                        sh "sudo docker push devrico003/next-carcenter-erding-k8s:latest"
                     }
                 }
             }
