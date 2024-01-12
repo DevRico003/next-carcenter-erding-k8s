@@ -15,7 +15,7 @@ spec:
       containers:
         - name: nextjs
           image: devrico003/next-carcenter-erding-k8s:latest
-          imagePullPolicy: Always
+          imagePullPolicy: Always # everytime we deploy, we want to pull the latest image
           env:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
