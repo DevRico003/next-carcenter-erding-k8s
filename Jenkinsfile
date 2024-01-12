@@ -45,7 +45,14 @@ pipeline {
                 script {
                     echo "Deploying to Kubernetes with image tag: ${env.BUILD_ID}"
                     withCredentials([file(credentialsId: 'kubeconfig-id', variable: 'KUBECONFIG')]) {
+                        // Setzen des neuen Images
                         sh "kubectl set image deployment/next-carcenter-erding nextjs=devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} --kubeconfig ${KUBECONFIG}"
+                        // Überprüfen des Deployment-Status
+                        sh "kubectl rollout status deployment/next-carcenter-erding --kubeconfig ${KUBECONFIG}"
+                        echo "Checking the current image used in the deployment..."
+                        sh "kubectl describe deployment next-carcenter-erdings --kubeconfig ${KUBECONFIG}"
+                        // Anzeigen der aktuellen Image-Version im Deployment
+                        sh "kubectl get deployment next-carcenter-erding -o=jsonpath='{$.spec.template.spec.containers[:1].image}' --kubeconfig ${KUBECONFIG}"
                     }
                 }
             }
