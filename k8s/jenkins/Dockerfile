@@ -16,10 +16,6 @@ RUN apt-get update && apt-get install -y docker-ce docker-ce-cli containerd.io
 # Jenkins-Benutzer zur Docker-Gruppe hinzufügen
 RUN usermod -aG docker jenkins
 
-# Kopieren des Kubernetes-Zertifikats und Importieren in den Java Keystore
-COPY kubernetes.crt /usr/local/share/ca-certificates/kubernetes.crt
-RUN keytool -import -alias kubernetes -keystore $JAVA_HOME/lib/security/cacerts -file /usr/local/share/ca-certificates/kubernetes.crt -storepass changeit -noprompt
-
 # Setzen von Sudo ohne Passwort für den Jenkins-Benutzer
 RUN echo "jenkins ALL=NOPASSWD: ALL" >> /etc/sudoers
 
