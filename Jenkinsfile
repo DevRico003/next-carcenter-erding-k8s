@@ -50,7 +50,7 @@ pipeline {
                         // Überprüfen des Deployment-Status
                         sh "kubectl rollout status deployment/next-carcenter-erding --kubeconfig ${KUBECONFIG}"
                         echo "Checking the current image used in the deployment..."
-                        sh "kubectl describe deployment next-carcenter-erdings --kubeconfig ${KUBECONFIG}"
+                        sh "kubectl describe deployment next-carcenter-erding --kubeconfig ${KUBECONFIG}"
                     }
                 }
             }
