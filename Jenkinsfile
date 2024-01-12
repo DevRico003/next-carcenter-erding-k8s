@@ -51,8 +51,6 @@ pipeline {
                         sh "kubectl rollout status deployment/next-carcenter-erding --kubeconfig ${KUBECONFIG}"
                         echo "Checking the current image used in the deployment..."
                         sh "kubectl describe deployment next-carcenter-erdings --kubeconfig ${KUBECONFIG}"
-                        // Anzeigen der aktuellen Image-Version im Deployment
-                        sh "kubectl get deployment next-carcenter-erding -o=jsonpath='{$.spec.template.spec.containers[:1].image}' --kubeconfig ${KUBECONFIG}"
                     }
                 }
             }
