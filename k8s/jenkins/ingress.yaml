@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jenkins-ingress
+  namespace: devops-tools
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Fügen Sie hier zusätzliche Jenkins-spezifische Ingress-Annotationen hinzu, falls benötigt
+spec:
+  tls:
+    - hosts:
+        - jenkins.devrico003.com
+      secretName: jenkins.devrico003-tls # Stellen Sie sicher, dass das TLS-Zertifikat vorhanden ist
+  rules:
+    - host: jenkins.devrico003.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jenkins-service # Stellen Sie sicher, dass dieser Service-Name existiert
+                port:
+                  number: 8080 # Der Port, auf dem Ihr Jenkins-Service läuft

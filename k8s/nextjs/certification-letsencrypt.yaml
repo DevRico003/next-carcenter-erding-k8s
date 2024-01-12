@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nextjs-cert
+  namespace: default  # Die Anwendung verwendet den Standard-Namespace
+spec:
+  secretName: k8s.devrico003-tls  # Das Secret muss im gleichen Namespace wie die Anwendung sein
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod  # Der ClusterIssuer ist clusterweit gültig
+  commonName: k8s.devrico003.com
+  dnsNames:
+  - k8s.devrico003.com

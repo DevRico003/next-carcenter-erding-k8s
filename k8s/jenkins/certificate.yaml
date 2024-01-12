@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: jenkins-cert
+  namespace: devops-tools  # Die Anwendung verwendet den Standard-Namespace
+spec:
+  secretName: jenkins.devrico003-tls  # Das Secret muss im gleichen Namespace wie die Anwendung sein
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod-jenkins  # Der ClusterIssuer ist clusterweit gültig
+  commonName: jenkins.devrico003.com
+  dnsNames:
+  - jenkins.devrico003.com

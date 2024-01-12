@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nextjs-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Stellen Sie sicher, dass Sie hier Ihren SSL-Konfigurationsanbieter konfigurieren
+spec:
+  tls:
+    - hosts:
+        - k8s.devrico003.com
+      secretName: k8s.devrico003-tls
+  rules:
+    - host: k8s.devrico003.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nextjs-service
+                port:
+                  number: 80
