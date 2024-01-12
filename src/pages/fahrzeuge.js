@@ -128,7 +128,7 @@ function CarListingLeftSidebar() {
                 <div className="col-lg-12">
                   <div className="show-item-and-filter">
                     <p>
-                      Es gibt ÄNDERUNG <strong>{filteredCars.length}</strong> verfügbare
+                      Es gibt ÄNDERUNGENNNN <strong>{filteredCars.length}</strong> verfügbare
                       Autos.
                     </p>
                   </div>
