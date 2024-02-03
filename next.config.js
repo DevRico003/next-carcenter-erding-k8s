@@ -4,9 +4,6 @@ const nextConfig = {
   typescript: {
       ignoreBuildErrors: true,
   },
-  esLint: {
-      ignoreDuringBuilds: true,
-  },
   output: 'standalone',
 }
 
