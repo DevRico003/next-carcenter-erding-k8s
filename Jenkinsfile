@@ -44,7 +44,7 @@ pipeline {
             steps {
                 script {
                     echo "Deploying to Kubernetes staging with image tag: ${env.BUILD_ID}"
-                    withCredentials([file(credentialsId: 'KUBECONFIG_ID_STAGING', variable: 'KUBECONFIG')]) {
+                    withCredentials([file(credentialsId: 'kubeconfig-id', variable: 'KUBECONFIG')]) {
                         sh "kubectl set image deployment/next-carcenter-erding-staging nextjs=devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} --kubeconfig ${KUBECONFIG} -n staging"
                         sh "kubectl rollout status deployment/next-carcenter-erding-staging --kubeconfig ${KUBECONFIG} -n staging"
                     }
@@ -68,7 +68,7 @@ pipeline {
             steps {
                 script {
                     echo "Deploying to Kubernetes production with image tag: ${env.BUILD_ID}"
-                    withCredentials([file(credentialsId: 'KUBECONFIG_ID_PROD', variable: 'KUBECONFIG')]) {
+                    withCredentials([file(credentialsId: 'kubeconfig-id', variable: 'KUBECONFIG')]) {
                         sh "kubectl set image deployment/next-carcenter-erding nextjs=devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} --kubeconfig ${KUBECONFIG} -n default"
                         try {
                             sh "kubectl rollout status deployment/next-carcenter-erding --kubeconfig ${KUBECONFIG} -n default"
