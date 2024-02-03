@@ -1,3 +1,3 @@
 export default function handler(req, res) {
-    res.status(400).send('Up!');
+    res.status(200).send('Up!');
   }
