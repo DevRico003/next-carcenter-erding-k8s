@@ -37,23 +37,28 @@ pipeline {
                     echo "Pushing Docker image with tag: latest"
                     sh "sudo docker push devrico003/next-carcenter-erding-k8s:latest"
                 }
-            }
+            } 
         }
 
         stage('Deploy to Kubernetes') {
-            steps {
-                script {
-                    echo "Deploying to Kubernetes with image tag: ${env.BUILD_ID}"
-                    withCredentials([file(credentialsId: 'kubeconfig-id', variable: 'KUBECONFIG')]) {
-                        // Setzen des neuen Images
-                        sh "kubectl set image deployment/next-carcenter-erding nextjs=devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} --kubeconfig ${KUBECONFIG} -n default"
-
+        steps {
+            script {
+                echo "Deploying to Kubernetes with image tag: ${env.BUILD_ID}"
+                withCredentials([file(credentialsId: 'kubeconfig-id', variable: 'KUBECONFIG')]) {
+                    sh "kubectl set image deployment/next-carcenter-erding nextjs=devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} --kubeconfig ${KUBECONFIG} -n default"
+                    // Überprüfung des Rollout-Status
+                    try {
+                        sh "kubectl rollout status deployment/next-carcenter-erding --kubeconfig ${KUBECONFIG} -n default"
+                    } catch (Exception e) {
+                        echo "Deployment failed, starting rollback..."
+                        sh "kubectl rollout undo deployment/next-carcenter-erding --kubeconfig ${KUBECONFIG} -n default"
+                        error "Deployment failed and rollback was initiated."
                     }
                 }
             }
         }
     }
-
+}
     post {
         always {
             echo 'Cleaning up workspace...'
