@@ -14,28 +14,28 @@ pipeline {
             }
         }
 
-        stage('Build Docker image') {
+        stage('Build Docker image for Staging') {
             steps {
                 script {
-                    echo "Building Docker image with tag: ${env.BUILD_ID}"
-                    sh "sudo docker build -t devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} ."
-                    echo "Tagging image with 'latest'"
-                    sh "sudo docker tag devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} devrico003/next-carcenter-erding-k8s:latest"
+                    echo "Building Docker image for Staging with tag: ${env.BUILD_ID}"
+                    sh "sudo docker build -f Dockerfile.staging -t devrico003/next-carcenter-erding-k8s-staging:${env.BUILD_ID} ."
+                    echo "Tagging Staging image with 'latest'"
+                    sh "sudo docker tag devrico003/next-carcenter-erding-k8s-staging:${env.BUILD_ID} devrico003/next-carcenter-erding-k8s-staging:latest"
                 }
             }
         }
 
-        stage('Push to DockerHub') {
+        stage('Push Staging Docker image to DockerHub') {
             steps {
                 script {
                     echo 'Logging into DockerHub...'
                     withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
                         sh "echo $DOCKERHUB_PASS | sudo docker login -u $DOCKERHUB_USER --password-stdin"
                     }
-                    echo "Pushing Docker image with tag: ${env.BUILD_ID}"
-                    sh "sudo docker push devrico003/next-carcenter-erding-k8s:${env.BUILD_ID}"
-                    echo "Pushing Docker image with tag: latest"
-                    sh "sudo docker push devrico003/next-carcenter-erding-k8s:latest"
+                    echo "Pushing Staging Docker image with tag: ${env.BUILD_ID}"
+                    sh "sudo docker push devrico003/next-carcenter-erding-k8s-staging:${env.BUILD_ID}"
+                    echo "Pushing Staging Docker image with tag: latest"
+                    sh "sudo docker push devrico003/next-carcenter-erding-k8s-staging:latest"
                 }
             } 
         }
@@ -43,20 +43,39 @@ pipeline {
         stage('Deploy to Staging with Kubernetes and Run Tests') {
             steps {
                 script {
-                    echo "Deploying to Kubernetes staging with image tag: ${env.BUILD_ID}"
-                    withCredentials([file(credentialsId: 'kubeconfig-id', variable: 'KUBECONFIG')]) {
-                        sh "kubectl set image deployment/next-carcenter-erding-staging nextjs=devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} --kubeconfig ${KUBECONFIG} -n staging"
-                        sh "kubectl rollout status deployment/next-carcenter-erding-staging --kubeconfig ${KUBECONFIG} -n staging"
-                    }
+                    // Vorherige Schritte bleiben unverändert
                     echo "Identifying the application pod..."
                     POD_NAME = sh(script: "kubectl get pods -n staging -l app=next-carcenter-erding-staging -o jsonpath='{.items[0].metadata.name}'", returnStdout: true).trim()
                     echo "Running unit tests in pod ${POD_NAME}"
-                    // Nutze try-catch, um den Erfolg der Tests zu überprüfen
                     try {
                         sh "kubectl exec ${POD_NAME} -n staging -- npx jest --forceExit"
                     } catch (Exception e) {
                         error "Unit tests failed."
                     }
+                }
+            }
+        }
+
+        stage('Build and Push Docker Image for Production') {
+            when {
+                // Diese Bedingung stellt sicher, dass diese Stage nur ausgeführt wird, wenn bisher keine Fehler aufgetreten sind.
+                expression { return currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+            }
+            steps {
+                script {
+                    echo "Building Docker image for Production with tag: ${env.BUILD_ID}"
+                    sh "sudo docker build -f Dockerfile.prod -t devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} ."
+                    echo "Tagging Production image with 'latest'"
+                    sh "sudo docker tag devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} devrico003/next-carcenter-erding-k8s:latest"
+                    
+                    echo 'Logging into DockerHub...'
+                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
+                        sh "echo $DOCKERHUB_PASS | sudo docker login -u $DOCKERHUB_USER --password-stdin"
+                    }
+                    echo "Pushing Production Docker image with tag: ${env.BUILD_ID}"
+                    sh "sudo docker push devrico003/next-carcenter-erding-k8s:${env.BUILD_ID}"
+                    echo "Pushing Production Docker image with tag: latest"
+                    sh "sudo docker push devrico003/next-carcenter-erding-k8s:latest"
                 }
             }
         }

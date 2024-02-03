@@ -1,0 +1,38 @@
+# Baustufe
+FROM node:18-alpine as builder
+WORKDIR /my-space
+
+# Kopiere package.json und package-lock.json und installiere alle Abhängigkeiten
+COPY package.json package-lock.json ./
+# Entferne die NODE_ENV-Zeile oder setze sie auf development, wenn du speziell devDependencies installieren möchtest
+# RUN npm ci installiert basierend auf package-lock.json, was für Konsistenz sorgt
+RUN npm ci
+
+# Kopiere den Rest des Projekts und baue es
+COPY . .
+RUN npm run build
+
+# Kein Bedarf, NODE_ENV hier zu setzen, da es für den Build-Prozess nicht relevant ist
+
+# Laufzeitstufe
+FROM node:18-alpine as runner
+RUN apk add --no-cache curl
+WORKDIR /my-space
+
+# Kopiere notwendige Dateien aus dem Builder
+COPY --from=builder /my-space/package.json .
+COPY --from=builder /my-space/package-lock.json .
+COPY --from=builder /my-space/next.config.js ./
+COPY --from=builder /my-space/public ./public
+COPY --from=builder /my-space/.next/standalone ./
+COPY --from=builder /my-space/.next/static ./.next/static
+
+# Setze NODE_ENV auf production für Laufzeitoptimierungen
+# Es ist wichtig für Next.js, im Produktionsmodus für bessere Leistung zu laufen
+ENV NODE_ENV=production
+ENV HOSTNAME=0.0.0.0
+
+EXPOSE 3000
+
+# Starte die Anwendung
+CMD ["node", "server.js"]
