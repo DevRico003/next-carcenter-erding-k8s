@@ -7,7 +7,7 @@ import Lightbox from "yet-another-react-lightbox";
 import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
 import "yet-another-react-lightbox/styles.css";
 import 'node_modules/react-modal-video/css/modal-video.css';
-import ModalVideo from 'react-modal-video';
+import 'react-modal-video/css/modal-video.css';
 import WhyChoose from "../components/Home1/WhyChoose/index";
 SwiperCore.use([Pagination, Autoplay, EffectFade, Navigation]);
 import MainLayout from '../layout/MainLayout'
