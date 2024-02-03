@@ -22,4 +22,4 @@ EXPOSE 3000
 
 # Starte die Anwendung oder führe Befehle aus, die für das Staging notwendig sind
 # Zum Beispiel: Starte den Entwicklungs-Server oder führe Tests aus
-CMD ["npm", "run", "test"]
+CMD ["npm", "run", "dev"]
