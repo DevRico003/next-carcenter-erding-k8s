@@ -55,13 +55,13 @@ spec:
             httpGet:
               path: /api/up
               port: 3000
-            initialDelaySeconds: 15
+            initialDelaySeconds: 1
             periodSeconds: 20
           readinessProbe:
             httpGet:
               path: /api/up
               port: 3000
-            initialDelaySeconds: 5
+            initialDelaySeconds: 1
             periodSeconds: 10
   strategy:
     type: RollingUpdate
