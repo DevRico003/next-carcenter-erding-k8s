@@ -40,25 +40,49 @@ pipeline {
             } 
         }
 
-        stage('Deploy to Kubernetes') {
-        steps {
-            script {
-                echo "Deploying to Kubernetes with image tag: ${env.BUILD_ID}"
-                withCredentials([file(credentialsId: 'kubeconfig-id', variable: 'KUBECONFIG')]) {
-                    sh "kubectl set image deployment/next-carcenter-erding nextjs=devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} --kubeconfig ${KUBECONFIG} -n default"
-                    // Überprüfung des Rollout-Status
+        stage('Deploy to Staging with Kubernetes and Run Tests') {
+            steps {
+                script {
+                    echo "Deploying to Kubernetes staging with image tag: ${env.BUILD_ID}"
+                    withCredentials([file(credentialsId: 'KUBECONFIG_ID_STAGING', variable: 'KUBECONFIG')]) {
+                        sh "kubectl set image deployment/next-carcenter-erding-staging nextjs=devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} --kubeconfig ${KUBECONFIG} -n staging"
+                        sh "kubectl rollout status deployment/next-carcenter-erding-staging --kubeconfig ${KUBECONFIG} -n staging"
+                    }
+                    echo "Identifying the application pod..."
+                    POD_NAME = sh(script: "kubectl get pods -n staging -l app=next-carcenter-erding-staging -o jsonpath='{.items[0].metadata.name}'", returnStdout: true).trim()
+                    echo "Running unit tests in pod ${POD_NAME}"
+                    // Nutze try-catch, um den Erfolg der Tests zu überprüfen
                     try {
-                        sh "kubectl rollout status deployment/next-carcenter-erding --kubeconfig ${KUBECONFIG} -n default"
+                        sh "kubectl exec ${POD_NAME} -n staging -- npm run test --forceExit"
                     } catch (Exception e) {
-                        echo "Deployment failed, starting rollback..."
-                        sh "kubectl rollout undo deployment/next-carcenter-erding --kubeconfig ${KUBECONFIG} -n default"
-                        error "Deployment failed and rollback was initiated."
+                        error "Unit tests failed."
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Production with Kubernetes') {
+            when {
+                expression { return currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+            }
+            steps {
+                script {
+                    echo "Deploying to Kubernetes production with image tag: ${env.BUILD_ID}"
+                    withCredentials([file(credentialsId: 'KUBECONFIG_ID_PROD', variable: 'KUBECONFIG')]) {
+                        sh "kubectl set image deployment/next-carcenter-erding nextjs=devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} --kubeconfig ${KUBECONFIG} -n default"
+                        try {
+                            sh "kubectl rollout status deployment/next-carcenter-erding --kubeconfig ${KUBECONFIG} -n default"
+                        } catch (Exception e) {
+                            echo "Deployment failed, starting rollback..."
+                            sh "kubectl rollout undo deployment/next-carcenter-erding --kubeconfig ${KUBECONFIG} -n default"
+                            error "Deployment failed and rollback was initiated."
+                        }
                     }
                 }
             }
         }
     }
-}
+
     post {
         always {
             echo 'Cleaning up workspace...'

@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nextjs-cert-staging
+  namespace: staging  # Die Anwendung verwendet den Standard-Namespace
+spec:
+  secretName: staging.devrico003-tls  # Das Secret muss im gleichen Namespace wie die Anwendung sein
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-staging  # Der ClusterIssuer ist clusterweit gültig
+  commonName: staging.devrico003.com
+  dnsNames:
+  - staging.devrico003.com

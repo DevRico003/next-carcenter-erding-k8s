@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: next-carcenter-erding-staging 
+  namespace: staging
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: next-carcenter-erding-staging 
+  template:
+    metadata:
+      labels:
+        app: next-carcenter-erding-staging 
+    spec:
+      containers:
+        - name: nextjs
+          image: devrico003/next-carcenter-erding-k8s:latest
+          imagePullPolicy: Always
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: secret-access-key
+            - name: AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: region-name
+            - name: AWS_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: bucket-name
+            - name: MONGODB_URI
+              value: "mongodb://mongodb-service-staging:27017/"
+            - name: SENDGRID_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: sendgrid-secret
+                  key: api-key
+            - name: ENCODED_CREDENTIALS
+              valueFrom:
+                secretKeyRef:
+                  name: app-credentials
+                  key: encoded-credentials
+          ports:
+            - containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /api/up
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /api/up
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1

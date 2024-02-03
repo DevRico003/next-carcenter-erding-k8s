@@ -4,7 +4,7 @@ import { Car } from '../../models/Car';
 import { CarImages } from '../../models/CarImages';
 
 // Function to fetch images for a single car
-const fetchImagesForCar = async (id) => { // id is the car ID
+export const fetchImagesForCar = async (id) => { // id is the car ID
   const encodedCredentials = process.env.ENCODED_CREDENTIALS;
   const url = `https://services.mobile.de/search-api/ad/${id}/images`;
 
