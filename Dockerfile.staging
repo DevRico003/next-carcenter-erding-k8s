@@ -1,5 +1,7 @@
 # Verwende das node:18-alpine Image als Basis
 FROM node:18-alpine
+
+# Setze das Arbeitsverzeichnis im Container
 WORKDIR /my-space
 
 # Installiere curl für Netzwerkanfragen, falls benötigt
@@ -9,17 +11,16 @@ RUN apk add --no-cache curl
 COPY package.json package-lock.json ./
 
 # Installiere alle Abhängigkeiten, einschließlich devDependencies
+# Entfernen Sie `NODE_ENV=production`, um sicherzustellen, dass devDependencies installiert werden
 RUN npm install
 
 # Kopiere den gesamten Quellcode in das Arbeitsverzeichnis des Containers
 COPY . .
 
-# Setze die Umgebungsvariablen für die Staging-Umgebung
-ENV NODE_ENV=development
-ENV HOSTNAME=0.0.0.0
-
 # Exponiere den Port, auf dem deine Anwendung läuft
 EXPOSE 3000
 
-# Definiere den Startbefehl für die Anwendung
+# Starte die Anwendung oder führe Befehle aus, die für das Staging notwendig sind
+# Zum Beispiel: Starte den Entwicklungs-Server oder führe Tests aus
+CMD ["npm", "run", "test"]
 CMD ["npm", "run", "dev"]
