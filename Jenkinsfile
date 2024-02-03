@@ -48,7 +48,7 @@ pipeline {
                     POD_NAME = sh(script: "kubectl get pods -n staging -l app=next-carcenter-erding-staging -o jsonpath='{.items[0].metadata.name}'", returnStdout: true).trim()
                     echo "Running unit tests in pod ${POD_NAME}"
                     try {
-                        sh "kubectl exec ${POD_NAME} -n staging -- npx jest --forceExit"
+                        sh "kubectl exec ${POD_NAME} -n staging -- npm run test --forceExit"
                     } catch (Exception e) {
                         error "Unit tests failed."
                     }
