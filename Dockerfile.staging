@@ -1,36 +1,25 @@
-# Baustufe
-FROM node:18-alpine as builder
+# Verwende das node:18-alpine Image als Basis
+FROM node:18-alpine
 WORKDIR /my-space
 
-# Kopiere package.json und package-lock.json und installiere alle Abhängigkeiten, einschließlich devDependencies
+# Installiere curl für Netzwerkanfragen, falls benötigt
+RUN apk add --no-cache curl
+
+# Kopiere package.json und package-lock.json in das Arbeitsverzeichnis
 COPY package.json package-lock.json ./
+
+# Installiere alle Abhängigkeiten, einschließlich devDependencies
 RUN npm install
 
-# Kopiere den gesamten Projektordner, einschließlich der Testdateien
+# Kopiere den gesamten Quellcode in das Arbeitsverzeichnis des Containers
 COPY . .
 
-# Stelle sicher, dass NODE_ENV auf development gesetzt ist, um die Umgebung für das Testen zu optimieren
-ENV NODE_ENV=development
-
-# Hier entfernen wir den Build-Schritt, da wir annehmen, dass du die Tests vor dem Build ausführen möchtest
-# Wenn du den Build-Schritt behalten möchtest, füge hier `RUN npm run build` ein
-
-# Laufzeitstufe
-FROM node:18-alpine as runner
-RUN apk add --no-cache curl
-WORKDIR /my-space
-
-# Kopiere notwendige Dateien aus dem Builder
-COPY --from=builder /my-space .
-
-# Für Staging ist es vielleicht sinnvoll, NODE_ENV auf 'development' zu lassen
-# Wenn du spezifische Einstellungen für Staging hast, passe diese hier entsprechend an
+# Setze die Umgebungsvariablen für die Staging-Umgebung
 ENV NODE_ENV=development
 ENV HOSTNAME=0.0.0.0
 
+# Exponiere den Port, auf dem deine Anwendung läuft
 EXPOSE 3000
 
-# Für Staging könntest du eine andere Startanweisung benötigen, zum Beispiel:
+# Definiere den Startbefehl für die Anwendung
 CMD ["npm", "run", "dev"]
-# Oder starte einen spezifischen Testbefehl, abhängig davon, wie du die Tests durchführen möchtest
-# Zum Beispiel: CMD ["npm", "test"]
