@@ -1,12 +1,11 @@
-# https://dev.to/rupadana/run-nextjs-using-docker-1a38
 FROM node:18-alpine as builder
 WORKDIR /my-space
 
 COPY package.json package-lock.json ./
-ENV NODE_ENV=production
 RUN npm ci
 COPY . .
 RUN npm run build
+ENV NODE_ENV=production
 
 FROM node:18-alpine as runner
 RUN apk add --no-cache curl
