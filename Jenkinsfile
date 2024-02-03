@@ -53,7 +53,7 @@ pipeline {
                     echo "Running unit tests in pod ${POD_NAME}"
                     // Nutze try-catch, um den Erfolg der Tests zu überprüfen
                     try {
-                        sh "kubectl exec ${POD_NAME} -n staging -- npm run test --forceExit"
+                        sh "kubectl exec ${POD_NAME} -n staging -- npx jest --forceExit"
                     } catch (Exception e) {
                         error "Unit tests failed."
                     }
