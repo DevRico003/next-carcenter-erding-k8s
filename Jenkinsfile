@@ -15,6 +15,7 @@ pipeline {
         }
 
         stage('Build Docker image for Staging') {
+            agent { label 'docker' }
             steps {
                 script {
                     echo "Building Docker image for Staging with tag: ${env.BUILD_ID}"
@@ -26,6 +27,7 @@ pipeline {
         }
 
         stage('Push Staging Docker image to DockerHub') {
+            agent { label 'docker' }
             steps {
                 script {
                     echo 'Logging into DockerHub...'
@@ -62,6 +64,7 @@ pipeline {
         }
 
         stage('Build and Push Docker Image for Production') {
+            agent { label 'docker' }
             when {
                 expression { return currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
