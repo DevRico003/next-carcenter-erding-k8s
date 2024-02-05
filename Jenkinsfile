@@ -15,7 +15,6 @@ pipeline {
         }
 
         stage('Build Docker image for Staging') {
-            agent { label 'docker-agent'}
             steps {
                 script {
                     echo "Building Docker image for Staging with tag: ${env.BUILD_ID}"
@@ -27,7 +26,6 @@ pipeline {
         }
 
         stage('Push Staging Docker image to DockerHub') {
-            agent { label 'docker-agent'}
             steps {
                 script {
                     echo 'Logging into DockerHub...'
@@ -63,7 +61,6 @@ pipeline {
         }
 
         stage('Build and Push Docker Image for Production') {
-            agent { label 'docker-agent'}
             when {
                 // Diese Bedingung stellt sicher, dass diese Stage nur ausgeführt wird, wenn bisher keine Fehler aufgetreten sind.
                 expression { return currentBuild.result == null || currentBuild.result == 'SUCCESS' }
