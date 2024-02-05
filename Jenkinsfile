@@ -15,7 +15,7 @@ pipeline {
         }
 
         stage('Build Docker image for Staging') {
-            agent { label 'docker' }
+            agent docker
             steps {
                 script {
                     echo "Building Docker image for Staging with tag: ${env.BUILD_ID}"
@@ -27,7 +27,7 @@ pipeline {
         }
 
         stage('Push Staging Docker image to DockerHub') {
-            agent { label 'docker' }
+            agent docker
             steps {
                 script {
                     echo 'Logging into DockerHub...'
@@ -43,7 +43,7 @@ pipeline {
         }
 
         stage('Deploy to Staging with Kubernetes and Run Tests') {
-            agent { label 'kubernetes' }
+            agent kubernetes
             steps {
                 script {
                     echo "Deploying to Kubernetes staging with image tag: ${env.BUILD_ID}"
@@ -64,7 +64,7 @@ pipeline {
         }
 
         stage('Build and Push Docker Image for Production') {
-            agent { label 'docker' }
+            agent docker
             when {
                 expression { return currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
@@ -88,7 +88,7 @@ pipeline {
         }
 
         stage('Deploy to Production with Kubernetes') {
-            agent { label 'kubernetes' }
+            agent kubernetes
             when {
                 expression { return currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
