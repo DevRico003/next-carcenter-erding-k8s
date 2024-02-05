@@ -62,7 +62,6 @@ pipeline {
 
         stage('Build and Push Docker Image for Production') {
             when {
-                // Diese Bedingung stellt sicher, dass diese Stage nur ausgeführt wird, wenn bisher keine Fehler aufgetreten sind.
                 expression { return currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
             steps {
