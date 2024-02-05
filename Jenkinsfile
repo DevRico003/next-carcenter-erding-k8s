@@ -15,6 +15,7 @@ pipeline {
         }
 
         stage('Build Docker image for Staging') {
+            agent { label 'docker-agent'}
             steps {
                 script {
                     echo "Building Docker image for Staging with tag: ${env.BUILD_ID}"
