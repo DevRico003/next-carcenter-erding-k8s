@@ -63,6 +63,11 @@ spec:
               port: 3000
             initialDelaySeconds: 5
             periodSeconds: 10
+          resources:
+            limits:
+              cpu: 500m
+            requests:
+              cpu: 200m
   strategy:
     type: RollingUpdate
     rollingUpdate:
