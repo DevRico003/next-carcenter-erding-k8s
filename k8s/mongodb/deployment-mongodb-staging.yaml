@@ -25,12 +25,3 @@ spec:
           volumeMounts:
             - name: mongodb-data
               mountPath: /data/db
-      affinity: # Node-Affinität hinzufügen
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: preferrednode
-                operator: In
-                values:
-                - carcenter-staging
