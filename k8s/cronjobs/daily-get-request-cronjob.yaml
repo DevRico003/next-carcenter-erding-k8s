@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: daily-get-request-mobile
+spec:
+  schedule: "0 0 * * *" # Täglich um Mitternacht
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: get-request-mobile
+            image: devrico003/get-request-mobile:latest
+          restartPolicy: OnFailure
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: daily-get-request-first-car-images
+spec:
+  schedule: "0 1 * * *" # Täglich um 1 Uhr Nachts
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: get-request-first-car-images
+            image: devrico003/get-request-first-car-images:latest
+          restartPolicy: OnFailure

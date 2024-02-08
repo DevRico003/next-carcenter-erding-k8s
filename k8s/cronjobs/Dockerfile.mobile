@@ -1,0 +1,14 @@
+# Verwenden eines Basisimages, das Bash und curl enthält
+FROM alpine:latest
+
+# Installieren von curl
+RUN apk add --no-cache curl
+
+# Hinzufügen des Bash-Skripts zum Docker-Image
+COPY get_request_mobile.sh /get_request_mobile.sh
+
+# Machen des Skripts ausführbar
+RUN chmod +x /get_request_mobile.sh
+
+# Ausführen des Skripts, wenn der Container startet
+CMD ["/bin/bash", "/get_request_mobile.sh"]
