@@ -60,12 +60,3 @@ spec:
       - name: docker-sock
         hostPath:
           path: /var/run/docker.sock
-      affinity: # Node-Affinität hinzufügen
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: preferrednode
-                operator: In
-                values:
-                - carcenter-staging

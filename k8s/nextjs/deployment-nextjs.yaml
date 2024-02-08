@@ -68,6 +68,15 @@ spec:
               cpu: 500m
             requests:
               cpu: 200m
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: preferrednode
+                operator: In
+                values:
+                - carcenter-staging
   strategy:
     type: RollingUpdate
     rollingUpdate:
