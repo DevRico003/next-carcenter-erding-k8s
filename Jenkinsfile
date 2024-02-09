@@ -10,26 +10,19 @@ pipeline {
             }
         }
 
-        stage('Build Docker image for Staging') {
+        stage('Build & Push Docker Image for Staging') {
             steps {
                 script {
                     echo "Building Docker image for Staging with tag: ${env.BUILD_ID}"
                     sh "docker build -f Dockerfile.staging -t devrico003/next-carcenter-erding-k8s-staging:${env.BUILD_ID} ."
                     echo "Tagging Staging image with 'latest'"
                     sh "docker tag devrico003/next-carcenter-erding-k8s-staging:${env.BUILD_ID} devrico003/next-carcenter-erding-k8s-staging:latest"
-                }
-            }
-        }
-
-        stage('Push Staging Docker image to DockerHub') {
-            steps {
-                script {
                     echo "Pushing Staging Docker image with tag: ${env.BUILD_ID}"
                     sh "docker push devrico003/next-carcenter-erding-k8s-staging:${env.BUILD_ID}"
                     echo "Pushing Staging Docker image with tag: latest"
                     sh "docker push devrico003/next-carcenter-erding-k8s-staging:latest"
                 }
-            } 
+            }
         }
 
         stage('Deploy to Staging with Kubernetes and Run Tests') {
