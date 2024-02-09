@@ -4,7 +4,6 @@ metadata:
   name: next-carcenter-erding-staging
   namespace: staging
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: next-carcenter-erding-staging

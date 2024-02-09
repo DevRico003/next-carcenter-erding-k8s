@@ -4,7 +4,6 @@ metadata:
   name: mongodb-staging
   namespace: staging
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: mongodb-staging
