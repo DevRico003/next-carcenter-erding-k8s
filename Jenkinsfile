@@ -1,10 +1,6 @@
 pipeline {
     agent { label 'agent'}
 
-    environment {
-        DOCKER_CREDENTIALS_ID = 'dockerhub-credentials-id' 
-    }
-
     stages {
         stage('Clone repository') {
             steps {
