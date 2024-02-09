@@ -18,9 +18,9 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker image for Staging with tag: ${env.BUILD_ID}"
-                    sh "sudo docker build -f Dockerfile.staging -t devrico003/next-carcenter-erding-k8s-staging:${env.BUILD_ID} ."
+                    sh "docker build -f Dockerfile.staging -t devrico003/next-carcenter-erding-k8s-staging:${env.BUILD_ID} ."
                     echo "Tagging Staging image with 'latest'"
-                    sh "sudo docker tag devrico003/next-carcenter-erding-k8s-staging:${env.BUILD_ID} devrico003/next-carcenter-erding-k8s-staging:latest"
+                    sh "docker tag devrico003/next-carcenter-erding-k8s-staging:${env.BUILD_ID} devrico003/next-carcenter-erding-k8s-staging:latest"
                 }
             }
         }
@@ -28,14 +28,10 @@ pipeline {
         stage('Push Staging Docker image to DockerHub') {
             steps {
                 script {
-                    echo 'Logging into DockerHub...'
-                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
-                        sh "echo $DOCKERHUB_PASS | sudo docker login -u $DOCKERHUB_USER --password-stdin"
-                    }
                     echo "Pushing Staging Docker image with tag: ${env.BUILD_ID}"
-                    sh "sudo docker push devrico003/next-carcenter-erding-k8s-staging:${env.BUILD_ID}"
+                    sh "docker push devrico003/next-carcenter-erding-k8s-staging:${env.BUILD_ID}"
                     echo "Pushing Staging Docker image with tag: latest"
-                    sh "sudo docker push devrico003/next-carcenter-erding-k8s-staging:latest"
+                    sh "docker push devrico003/next-carcenter-erding-k8s-staging:latest"
                 }
             } 
         }
@@ -44,10 +40,9 @@ pipeline {
             steps {
                 script {
                     echo "Deploying to Kubernetes staging with image tag: ${env.BUILD_ID}"
-                    withCredentials([file(credentialsId: 'kubeconfig-id', variable: 'KUBECONFIG')]) {
-                        sh "kubectl set image deployment/next-carcenter-erding-staging nextjs=devrico003/next-carcenter-erding-k8s-staging:${env.BUILD_ID} --kubeconfig ${KUBECONFIG} -n staging"
-                        sh "kubectl rollout status deployment/next-carcenter-erding-staging --kubeconfig ${KUBECONFIG} -n staging"
-                    }
+                    sh "kubectl set image deployment/next-carcenter-erding-staging nextjs=devrico003/next-carcenter-erding-k8s-staging:${env.BUILD_ID} --kubeconfig ${KUBECONFIG} -n staging"
+                    sh "kubectl rollout status deployment/next-carcenter-erding-staging --kubeconfig ${KUBECONFIG} -n staging"
+                    
                     echo "Identifying the application pod..."
                     POD_NAME = sh(script: "kubectl get pods -n staging -l app=next-carcenter-erding-staging -o jsonpath='{.items[0].metadata.name}'", returnStdout: true).trim()
                     echo "Running unit tests in pod ${POD_NAME}"
@@ -67,18 +62,13 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker image for Production with tag: ${env.BUILD_ID}"
-                    sh "sudo docker build -f Dockerfile.prod -t devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} ."
+                    sh "docker build -f Dockerfile.prod -t devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} ."
                     echo "Tagging Production image with 'latest'"
-                    sh "sudo docker tag devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} devrico003/next-carcenter-erding-k8s:latest"
-                    
-                    echo 'Logging into DockerHub...'
-                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
-                        sh "echo $DOCKERHUB_PASS | sudo docker login -u $DOCKERHUB_USER --password-stdin"
-                    }
+                    sh "docker tag devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} devrico003/next-carcenter-erding-k8s:latest"
                     echo "Pushing Production Docker image with tag: ${env.BUILD_ID}"
-                    sh "sudo docker push devrico003/next-carcenter-erding-k8s:${env.BUILD_ID}"
+                    sh "docker push devrico003/next-carcenter-erding-k8s:${env.BUILD_ID}"
                     echo "Pushing Production Docker image with tag: latest"
-                    sh "sudo docker push devrico003/next-carcenter-erding-k8s:latest"
+                    sh "docker push devrico003/next-carcenter-erding-k8s:latest"
                 }
             }
         }
@@ -90,16 +80,15 @@ pipeline {
             steps {
                 script {
                     echo "Deploying to Kubernetes production with image tag: ${env.BUILD_ID}"
-                    withCredentials([file(credentialsId: 'kubeconfig-id', variable: 'KUBECONFIG')]) {
-                        sh "kubectl set image deployment/next-carcenter-erding nextjs=devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} --kubeconfig ${KUBECONFIG} -n default"
-                        try {
-                            sh "kubectl rollout status deployment/next-carcenter-erding --kubeconfig ${KUBECONFIG} -n default"
-                        } catch (Exception e) {
-                            echo "Deployment failed, starting rollback..."
-                            sh "kubectl rollout undo deployment/next-carcenter-erding --kubeconfig ${KUBECONFIG} -n default"
-                            error "Deployment failed and rollback was initiated."
-                        }
+                    sh "kubectl set image deployment/next-carcenter-erding nextjs=devrico003/next-carcenter-erding-k8s:${env.BUILD_ID} --kubeconfig ${KUBECONFIG} -n default"
+                    try {
+                        sh "kubectl rollout status deployment/next-carcenter-erding --kubeconfig ${KUBECONFIG} -n default"
+                    } catch (Exception e) {
+                        echo "Deployment failed, starting rollback..."
+                        sh "kubectl rollout undo deployment/next-carcenter-erding --kubeconfig ${KUBECONFIG} -n default"
+                        error "Deployment failed and rollback was initiated."
                     }
+                    
                 }
             }
         }
