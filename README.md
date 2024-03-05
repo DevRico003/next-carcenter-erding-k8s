@@ -29,7 +29,7 @@ The application is tailored to streamline car dealership operations, integrating
 
 ### Application Architecture
 
-![Application Architecture](App_Architecture.png)
+![Application Architecture](Fullstack-App_Architecture.png)
 
 ## Getting Started
 
