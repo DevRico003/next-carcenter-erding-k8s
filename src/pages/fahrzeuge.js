@@ -73,7 +73,7 @@ function CarListingLeftSidebar() {
     query.make,
   ]);
 
-  // Paginierung der gefilterten Autos
+  // Update displayedCars whenever the filteredCars or pagination changes
   useEffect(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -86,7 +86,7 @@ function CarListingLeftSidebar() {
     setCurrentPage(page);
   }, [query.page]);
 
-  // Handlers for updating filters and pagination
+  // Update the URL whenever a filter changes
   const onMakeFilterChange = (newMakeFilter) => {
     setMakeFilter(newMakeFilter);
   };
@@ -101,7 +101,7 @@ function CarListingLeftSidebar() {
   };
 
   const handlePageChange = (newPage) => {
-    // Aktualisiere die URL mit der neuen Seite
+    // Update the URL
     const newQuery = { ...query, page: newPage };
     router.push({ pathname: router.pathname, query: newQuery });
 
@@ -128,7 +128,7 @@ function CarListingLeftSidebar() {
                 <div className="col-lg-12">
                   <div className="show-item-and-filter">
                     <p>
-                      Es gibt <strong>{filteredCars.length}</strong> verfügbare
+                      Es gibt <strong>{filteredCars.length}</strong> verfügbare Änderungen
                       Autos.
                     </p>
                   </div>
